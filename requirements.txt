@@ -1,0 +1,2 @@
+emoji==1.2.0
+contractions==0.0.52
