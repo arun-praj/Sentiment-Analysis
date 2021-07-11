@@ -2,7 +2,7 @@ import string,re
 from time import perf_counter
 import emoji,contractions as cn
 
-def preprocess_string(text_arg:"String"):
+def cleaner(text_arg:"String"):
     """
         Parameters:
         ______________________________
