@@ -1,4 +1,4 @@
 emoji==1.2.0
-contractions==0.0.52
+contractions==0.0.18
 numpy==1.20.3
 scikit-learn==0.24.2
