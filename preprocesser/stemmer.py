@@ -4,6 +4,7 @@ class AbstractStemmer:
 
 class PorterStemmer(AbstractStemmer):
     """
+    A Stemmer class
     tutorial from: https://medium.com/analytics-vidhya/building-a-stemmer-492e9a128e84
     """
     consonants = "bcdfghjklmnpqrstwxz"
@@ -183,6 +184,7 @@ class PorterStemmer(AbstractStemmer):
         #                                 sky          ->  sky
         if self._check_vowel(stem) and stem.endswith('y'):
             stem = stem[:-1] + "i"
+
         return stem
 
     def _porter_step_2(self, stem):
@@ -218,7 +220,7 @@ class PorterStemmer(AbstractStemmer):
                 if stem.endswith(termination):
                     stem =  stem[: -len(termination)] + substitute
                     break
-        return stem 
+        return stem
 
     def _porter_step_3(self, stem):
 
@@ -238,7 +240,7 @@ class PorterStemmer(AbstractStemmer):
                 if stem.endswith(termination):
                     stem =  stem[: -len(termination)] + substitute
                     break
-        return stem 
+        return stem
 
     def _porter_step_4(self, stem):
         """
@@ -280,7 +282,7 @@ class PorterStemmer(AbstractStemmer):
             for suffix in suffixes_2:
                 if stem.endswith(suffix):
                     return stem[: -len(suffix)]
-            return stem
+        return stem
 
     def _porter_step_5(self, stem):
         # Step 5a
@@ -296,7 +298,7 @@ class PorterStemmer(AbstractStemmer):
         #                                     roll           ->  roll
 
         #step 5a
-        if self._determine_m(stem) > 1 and stem.endswith('e'):
+        if self._determine_m(stem) > 1 and stem.endswith('e') and len(stem) > 4:
             stem = stem[:-1]
         elif self._determine_m(stem) == 1 and not self._check_o(stem) and stem.endswith('e') and len(stem) > 4:
             stem = stem[:-1]
@@ -304,7 +306,22 @@ class PorterStemmer(AbstractStemmer):
         if self._determine_m(stem) > 1 and self._check_endswith(stem, "dl") and len(stem) > 4:
             stem = stem[:-1]
         return stem
-            
-p = PorterStemmer()
-print(p._porter_step_4("normalize"))
+    
+    def stem_now(self, sentence):
+        """
+            input: A string sentence
+        """
+        stem_words = []
+        for stem in sentence.split():
+            stem = self._porter_step_1(stem)
+            stem = self._porter_step_2(stem)
+            stem = self._porter_step_3(stem)
+            stem = self._porter_step_4(stem)
+            stem = self._porter_step_5(stem)
+            stem_words.append(stem)
+        
+        return " ".join(stem_words)
+
+# p = PorterStemmer()
+# print(p._porter_step_4("aaa"))
 

@@ -1,3 +1,3 @@
 from .cleaner import *
-from .stemmer import *
+from .stemmer import PorterStemmer
 
