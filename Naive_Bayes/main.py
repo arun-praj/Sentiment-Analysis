@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from naive_bayes import NaiveBayes
 
-training_set=pd.read_csv('labeledTrainData.tsv',sep='\t')
+training_set=pd.read_csv('Naive_Bayes/labeledTrainData.tsv',sep='\t')
 
 #getting training set examples labels
 y_train=training_set['sentiment'].values
@@ -36,7 +36,7 @@ print ("Test Set Examples: ",test_labels.shape[0])
 print ("Test Set Accuracy: ",test_acc)
 
 # testing
-test=pd.read_csv('testData.tsv',sep='\t')
+test=pd.read_csv('Naive_bayes/testData.tsv',sep='\t')
 Xtest=test.review.values
 
 #generating predictions....
