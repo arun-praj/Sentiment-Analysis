@@ -10,3 +10,5 @@ preprocesser/__pycache__/stemmer.cpython-39.pyc
 preprocesser/__pycache__/__init__.cpython-39.pyc
 *.tsv
 .vscode/settings.json
+preprocesser/cleaner.py
+preprocesser/__pycache__/stemmer.cpython-39.pyc

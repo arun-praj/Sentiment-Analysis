@@ -1,5 +1,6 @@
 import string,re
 from time import perf_counter
+from bs4 import BeautifulSoup
 import emoji,contractions as cn
 
 def cleaner(text_arg:"String"):
@@ -23,8 +24,13 @@ def cleaner(text_arg:"String"):
         processed_string:String
     """
 
+    # remove html tag
+    soup = BeautifulSoup(text_arg, "html.parser")
+    processed_string = soup.get_text()
+    text_arg = re.sub('\[[^]]*\]', '', processed_string)
+    
     # remove contractions . eg: I've : I have
-    processed_string = cn.fix(text_arg)
+    processed_string = cn.fix(processed_string)
     # to lower
     processed_string = processed_string.lower()
 
