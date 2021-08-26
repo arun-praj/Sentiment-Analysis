@@ -13,3 +13,4 @@ preprocesser/__pycache__/__init__.cpython-39.pyc
 .vscode/settings.json
 preprocesser/cleaner.py
 preprocesser/__pycache__/stemmer.cpython-39.pyc
+NN Model/.ipynb_checkpoints/main-checkpoint.ipynb
