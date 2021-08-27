@@ -48,3 +48,8 @@
     * d -> docuemnt (set of words)
     * n-> count of corpus
         - corpus -> total document set
+
+# How to convert Text to Vectorizer
+
+    - We can use either CountVectorizer or TfidfTransfomer
+    - In this project we use TfidfVectorizer (uses bothCountVectorizer and TfidfTransfomer)
