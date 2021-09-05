@@ -10,7 +10,7 @@ import sys
 import _thread
 from datetime import datetime
 
-# ui
+# ui variables
 is_running=True
 final_text  =[]
 root = Tk()
@@ -21,24 +21,18 @@ fls_diff = StringVar()
 
 ##
 canvas = Canvas(root, width=800, height=650)
-canvas.create_text(100,10,fill="darkblue",font="Times 20 italic bold",
-                        text="Click the bubbles that are multiples of two.")
-##
 
 fls.set('Start Record') # Update
 fls2.set('Your Speech')
 fls3.set('')
-
 
 wrapper = LabelFrame(root,text='Spech to Text')
 wrapper.pack(fill="both",expand="yes",padx=10,pady=10)
 
 lbl3 = Label(wrapper,textvariable=fls3)
 lbl3.pack()
-
 lbl = Label(wrapper,textvariable=fls)
 lbl.pack()
-
 lbl2 = Label(wrapper,textvariable=fls2)
 lbl2.pack()
 
@@ -53,12 +47,13 @@ def record():
 def stop():
     global is_running,final_text
     is_running = False
-    fls.set('Start Recording') 
+    fls.set('Start Record') 
     btn1.pack(padx=20)
     btn2.pack_forget()
+    time_stamp = f"gui/{datetime.now().strftime('%Y-%m-%d %H-%M-%S')}.txt"
     time_stamp = 'gui/record.txt'
     with open(time_stamp, 'w') as f:
-        f.write(' '.join(final_text))
+        f.write('\n'.join(final_text))
         f.close()
 
 def startrecord():
@@ -92,26 +87,16 @@ def startrecord():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         parents=[parser])
 
-    parser.add_argument(
-        '-f', '--filename', type=str, metavar='FILENAME',
-        help='audio file to store recording to')
-
-    parser.add_argument(
-        '-m', '--model', type=str, metavar='MODEL_PATH',
-        help='Path to the model')
-
-    parser.add_argument(
-        '-d', '--device', type=int_or_str,
-        help='input device (numeric ID or substring)')
-
-    parser.add_argument(
-        '-r', '--samplerate', type=int, help='sampling rate')
+    parser.add_argument('-f', '--filename', type=str, metavar='FILENAME',help='audio file to store recording to')
+    parser.add_argument('-m', '--model', type=str, metavar='MODEL_PATH',help='Path to the model')
+    parser.add_argument('-d', '--device', type=int_or_str,help='input device (numeric ID or substring)')
+    parser.add_argument('-r', '--samplerate', type=int, help='sampling rate')
     args = parser.parse_args(remaining)
     try:
         if args.model is None:
             args.model = "gui/model"
         if not os.path.exists(args.model):
-            print ("Please download a model for your language from https://alphacephei.com/vosk/models")
+            print ("Download model from https://alphacephei.com/vosk/models")
             print ("and unpack as 'model' in the current folder.")
             parser.exit(0)
         if args.samplerate is None:
@@ -128,9 +113,9 @@ def startrecord():
 
         with sounddevice.RawInputStream(samplerate=args.samplerate, blocksize = 8000, device=args.device, dtype='int16',
                                 channels=1, callback=callback):
-                print('#' * 80)
+                print('#' * 20)
                 print('Press Ctrl+C to stop the recording')
-                print('#' * 80)
+                print('#' * 20)
 
                 rec = vosk.KaldiRecognizer(model, args.samplerate)
                 while is_running:
@@ -163,8 +148,8 @@ def startrecord():
     except Exception as e:
         parser.exit(type(e).__name__ + ': ' + str(e))
 
-# btn3 = Button(wrapper,text="Exit",command=lambda:exit())
-# btn3.pack(padx=1)
+btn3 = Button(wrapper,text="Exit",command=lambda:exit())
+btn3.pack(padx=1)
 
 btn1 = Button(wrapper,text="Record",command=record)
 btn1.pack(padx=20)
