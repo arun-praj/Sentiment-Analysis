@@ -14,6 +14,9 @@ style = ttk.Style()
 style.theme_use('vista')
 # ('winnative', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnative')
 
+# global variables
+is_recording = False
+
 # row 0
 first_frame = ttk.Frame(window)
 first_frame.columnconfigure(0, weight=1)
@@ -22,8 +25,18 @@ first_frame.grid(row=0,column=0)
 
 def mic_clicked():
     print('mic clicked')
-
+    global is_recording
+    if is_recording:
+        is_recording = False
+        mic_button.config(image=mic_icon)
+        second_frame.config(text='Input Text')
+    else:
+        is_recording = True
+        mic_button.config(image=mic_rec)
+        second_frame.config(text='Recording ...')
+    
 mic_icon = PhotoImage(file='gui/mic-4.png')
+mic_rec = PhotoImage(file='gui/mic-44.png')
 mic_button = Button(first_frame,image=mic_icon,command=mic_clicked,borderwidth=1,relief=RIDGE,width=60,height=60)
 mic_button.grid(column=0,row=0,padx=5,pady=5)
 
