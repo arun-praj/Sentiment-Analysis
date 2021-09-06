@@ -15,3 +15,4 @@ preprocesser/cleaner.py
 preprocesser/__pycache__/stemmer.cpython-39.pyc
 NN Model/.ipynb_checkpoints/main-checkpoint.ipynb
 gui/record.txt
+gui/test.py

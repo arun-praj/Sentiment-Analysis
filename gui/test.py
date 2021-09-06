@@ -34,7 +34,24 @@ fred.grid(column=2,row=1)
 combo = ttk.Combobox();
 combo["values"] = (1,2,3,4,5,'Text')
 combo.current(3)
+print(combo.get())
 combo.grid(column=1,row=5)
+
+# Menubutton
+def menu_item_selected(*args):
+    print(selected_color.get())
+    menu_button.config(text=selected_color.get())
+
+selected_color = StringVar()
+selected_color.trace("w", menu_item_selected)
+
+menu_button = Menubutton(text='Select a color')
+menu = Menu(menu_button,tearoff=0)
+menu.add_radiobutton(label='Red',value='Red',variable=selected_color)
+menu.add_radiobutton(label='Green',value='Green',variable=selected_color)
+menu.add_radiobutton(label='Blue',value='Blue',variable=selected_color)
+menu_button['menu'] = menu
+menu_button.grid(column=2,row=5)
 
 # Text
 text = Text(height=5,width=30)
@@ -112,9 +129,9 @@ bind_btn.bind("<Button-1>",left_fun_bind_btn)
 bind_btn.grid(row=7,column=0)
 
 # Add images
-icon = PhotoImage(file='Modules_Python/Tkinter/icon.png')
-img_label = Label(image=icon)
-img_label.grid(row=8,column=0)
+# icon = PhotoImage(file='gui/icon.ico')
+# img_label = Label(image=icon)
+# img_label.grid(row=8,column=0)
 
 
 window.mainloop()
