@@ -1,19 +1,18 @@
 from tkinter import *
-from typing import Sized
 from stopword import removing_stopwords
 from tkinter import ttk,filedialog
 from tkinter import scrolledtext
-from tkinter import messagebox
 from cleaner import cleaner
 import pandas as pd
 import sounddevice
 import argparse
 import _thread
+import pickle
 import queue
 import vosk
-import sys
 import ast
 import os
+import asyncio
 
 window = Tk()
 window.geometry("826x500")
@@ -22,15 +21,41 @@ window.wm_iconbitmap('gui/icon.ico')
 window.title('Sentimental Analysis')
 
 style = ttk.Style()
-style.theme_use('vista')
-# ('winnative', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnative')
+style.theme_use('vista')# ('winnative', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnative')
 
 # global variables
-is_recording = False
-final_text = []
-cleaned_text = []
+is_recording,model_loaded = False,False
+final_text,cleaned_text = [],[]
+gnb,mnb,bnb,nb_tf,logreg,log_tf,linear_svc,svc_tf,rnd_f,rnd_tf,knn,knn_tf,dec_t,dec_tf = None,None,None,None,None,None,None,None,None,None,None,None,None,None
 current_text = StringVar()
 current_text.set('What it does: Detecting the intentions behind text response')
+
+# Load model
+def load_model():
+    global gnb,mnb,bnb,nb_tf,logreg,log_tf,linear_svc,svc_tf,rnd_f,rnd_tf,knn,knn_tf,dec_t,dec_tf
+    global model_loaded
+    model_loaded = True
+    print('____model loading_____')
+    gnb = pickle.load(open('Naive_Bayes/gnb.sav','rb'))
+    mnb = pickle.load(open('Naive_Bayes/mnb.sav','rb'))
+    bnb = pickle.load(open('Naive_Bayes/bnb.sav','rb'))
+    nb_tf = pickle.load(open('Naive_Bayes/vectorizer.sav','rb'))
+
+    logreg = pickle.load(open('Logestic_Regression/logreg.sav','rb'))
+    log_tf = pickle.load(open('Logestic_Regression/vectorizer.sav','rb'))
+
+    linear_svc = pickle.load(open('SVC/linear_svc.sav','rb'))
+    svc_tf = pickle.load(open('SVC/vectorizer.sav','rb'))
+
+    rnd_f = pickle.load(open('Random Forest/rnd_f.sav','rb'))
+    rnd_tf = pickle.load(open('Random Forest/vectorizer.sav','rb'))
+
+    knn = pickle.load(open('KNN/knn.sav','rb'))
+    knn_tf = pickle.load(open('KNN/vectorizer.sav','rb'))
+
+    dec_t = pickle.load(open('Decision Tree/dec_tree.sav','rb'))
+    dec_tf = pickle.load(open('Decision Tree/vectorizer.sav','rb'))
+    print('____model loaded_____')
 
 # row 0
 first_frame = ttk.Frame(window)
@@ -189,7 +214,29 @@ def analyze_clicked():
     text_input.delete('0.0', END)
     text_input.insert(END,'\n'.join(list_sentence))
     cleaned_text = list_sentence
-    ############################
+    # print(cleaned_text)
+    ############ Testing ##############
+    if len(cleaned_text) !=0:
+        if not model_loaded:
+            load_model()
+        po_ne = lambda x: 'pos' if x==1 else 'neg'
+        classes_gnb = gnb.predict(nb_tf.transform(cleaned_text).toarray())
+        classes_mnb = mnb.predict(nb_tf.transform(cleaned_text))
+        classes_bnb = bnb.predict(nb_tf.transform(cleaned_text))
+        decision_t = dec_t.predict(dec_tf.transform(cleaned_text).toarray())
+        knn_c = knn.predict(knn_tf.transform(cleaned_text).toarray())
+        logRe = logreg.predict(log_tf.transform(cleaned_text).toarray())
+        random_f = rnd_f.predict(rnd_tf.transform(cleaned_text).toarray())
+        linear = linear_svc.predict(svc_tf.transform(cleaned_text).toarray())
+        
+        for item in tree2.get_children():
+            tree2.delete(item)
+        for item in tree3.get_children():
+            tree3.delete(item)
+        for sentence,g,m,b,dec,knnC,LOGREs,randomF,svc_lin in zip(cleaned_text,classes_gnb,classes_mnb,classes_bnb,decision_t,knn_c,logRe,random_f,linear):
+            tree2.insert('', 'end', text="1", values=(sentence,po_ne(LOGREs),po_ne(svc_lin),po_ne(m),po_ne(randomF),po_ne(b),po_ne(knnC),po_ne(g),po_ne(dec)))
+            tree3.insert('', 'end', text="1", values=(sentence,'pos' if (g+m+b+dec+knnC+LOGREs+randomF+svc_lin)>=4 else 'neg'))
+
 
 analyze_button = Button(second_frame,text='  Analyze ',font=('Comic Sans MS',18,'normal'),command=analyze_clicked,borderwidth=1,relief=RAISED ,pady=10)
 analyze_button.grid(column=1,row=0)
@@ -226,7 +273,7 @@ tree.insert('', 'end', text="1", values=('Decision Tree',0.72,71.7,71.1,71.9))
 tree.grid(row=0,column=0,pady=10,padx=5)
 
 tree2 = ttk.Treeview(third_notebook,column=("Sentence/Algorithm",'Logestic', "SVC","Multinomial NB","Random Forest","Bernoulli NB","KNN","Gaussain NB","Decision Tree"), show='headings', height=9)
-tree2.column("# 1", anchor=CENTER)
+tree2.column("# 1")
 tree2.heading("#1", text="Sentence/Algorithm")
 tree2.column("# 2", anchor=CENTER,width=38)
 tree2.heading("#2", text="Logestic")
@@ -244,22 +291,19 @@ tree2.column("# 8", anchor=CENTER,width=60)
 tree2.heading("#8", text="Gaussain NB")
 tree2.column("# 9", anchor=CENTER,width=66)
 tree2.heading("#9", text="Decision Tree")
-
-tree2.insert('', 'end', text="1", values=('KNN Random Forest Random Forest Random Forest Random Forest','86%','Best'))
-tree2.insert('', 'end', text="1", values=('KNN Random Forest Random Forest Random Forest Random Forest','86%','Best'))
-tree2.insert('', 'end', text="1", values=('KNN Random Forest Random Forest Random Forest Random Forest','86%','Best'))
-tree2.insert('', 'end', text="1", values=('KNN Random Forest Random Forest Random Forest Random Forest','86%','Best'))
-tree2.insert('', 'end', text="1", values=('KNN Random Forest Random Forest Random Forest Random Forest','86%','Best'))
-tree2.insert('', 'end', text="1", values=('KNN Random Forest Random Forest Random Forest Random Forest','86%','Best'))
-tree2.insert('', 'end', text="1", values=('KNN Random Forest Random Forest Random Forest Random Forest','86%','Best'))
-tree2.insert('', 'end', text="1", values=('KNN1 Random Forest Random Forest Random Forest Random Forest','86%','Best'))
-tree2.insert('', 'end', text="1", values=('KNN2 Random Forest Random Forest Random Forest Random Forest','86%','Best'))
-tree2.insert('', 'end', text="1", values=('KNN3 Random Forest Random Forest Random Forest Random Forest','86%','Best'))
-tree2.insert('', 'end', text="1", values=('KNN4 Random Forest Random Forest Random Forest Random Forest','86%','Best'))
-tree2.insert('', 'end', text="1", values=('KNN5 Random Forest Random Forest Random Forest Random Forest','86%','Best'))
+# tree2.insert('', 'end', text="1", values=('KNN Random Forest Random Forest Random Forest Random Forest','86%','Best'))
 tree2.grid(row=0,column=0,pady=10,padx=5)
 
+tree3 = ttk.Treeview(third_notebook,column=("Sentence",'Sentiment'), show='headings', height=9)
+tree3.column("# 1")
+tree3.heading("#1", text="Sentence")
+tree3.column("# 2",anchor=CENTER,width=20)
+tree3.heading("#2", text="Sentiment")
+# tree3.insert('', 'end', text="1", values=('KNN Random Forest Random Forest Random Forest Random Forest','pos'))
+tree3.grid(row=0,column=0,pady=10,padx=5)
+
 third_notebook.add(tree2,text='Sentiment')
+third_notebook.add(tree3,text='Sentence')
 third_notebook.add(tree,text='Result')
 
 window.mainloop()
