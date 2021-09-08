@@ -1,5 +1,6 @@
 from tkinter import *
 from stopword import removing_stopwords
+from porter_stemmer import porter_stemmer
 from tkinter import ttk,filedialog
 from tkinter import scrolledtext
 from cleaner import cleaner
@@ -21,7 +22,7 @@ window.wm_iconbitmap('gui/icon.ico')
 window.title('Sentimental Analysis')
 
 style = ttk.Style()
-style.theme_use('vista')# ('winnative', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnative')
+style.theme_use('clam')# ('winnative', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnative')
 
 # global variables
 is_recording,model_loaded = False,False
@@ -210,7 +211,7 @@ text_input.grid(row=0,column=0,padx=0,pady=4)
 def analyze_clicked():
     global cleaned_text
     list_sentence = text_input.get('1.0',END).split('\n')
-    list_sentence = [removing_stopwords(cleaner(sentence)) for sentence in list_sentence if len(sentence)!=0]
+    list_sentence = [porter_stemmer(removing_stopwords(cleaner(sentence))) for sentence in list_sentence if len(sentence)!=0]
     text_input.delete('0.0', END)
     text_input.insert(END,'\n'.join(list_sentence))
     cleaned_text = list_sentence
@@ -305,5 +306,6 @@ tree3.grid(row=0,column=0,pady=10,padx=5)
 third_notebook.add(tree2,text='Sentiment')
 third_notebook.add(tree3,text='Sentence')
 third_notebook.add(tree,text='Result')
+
 
 window.mainloop()

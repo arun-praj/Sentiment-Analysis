@@ -1,9 +1,9 @@
 import string,re
-from time import perf_counter
+# from time import perf_counter
 from bs4 import BeautifulSoup
 import emoji,contractions as cn
 
-def cleaner(text_arg:"String"):
+def cleaner(text_arg):
     """
         Parameters:
         ______________________________

@@ -322,6 +322,8 @@ class PorterStemmer(AbstractStemmer):
         
         return " ".join(stem_words)
 
-# p = PorterStemmer()
-# print(p._porter_step_4("aaa"))
+p = PorterStemmer()
+# print(p.stem_now("This is your dad"))
+
+print(p.stem_now("He is going to playing singing reading laughing"))
 
