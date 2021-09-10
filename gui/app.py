@@ -1,35 +1,26 @@
 from tkinter import *
 from stopword import removing_stopwords
-from porter_stemmer import porter_stemmer
 from tkinter import ttk,filedialog
 from tkinter import scrolledtext
 from cleaner import cleaner
-import pandas as pd
-import sounddevice
-import argparse
-import _thread
-import pickle
-import queue
-import vosk
-import ast
-import os
-import asyncio
+import sounddevice,argparse,_thread,pickle
+import queue,vosk,ast,os
 
 window = Tk()
-window.geometry("826x500")
+window.geometry("826x630")
 # window.resizable(0,0)
 window.wm_iconbitmap('gui/icon.ico')
 window.title('Sentimental Analysis')
 
 style = ttk.Style()
-style.theme_use('clam')# ('winnative', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnative')
+style.theme_use('xpnative')# ('winnative', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnative')
 
 # global variables
 is_recording,model_loaded = False,False
 final_text,cleaned_text = [],[]
 gnb,mnb,bnb,nb_tf,logreg,log_tf,linear_svc,svc_tf,rnd_f,rnd_tf,knn,knn_tf,dec_t,dec_tf = None,None,None,None,None,None,None,None,None,None,None,None,None,None
 current_text = StringVar()
-current_text.set('What it does: Detecting the intentions behind text response')
+current_text.set('What it does: Detect the intentions behind text response')
 
 # Load model
 def load_model():
@@ -204,18 +195,19 @@ second_frame.grid(row=1,column=0,ipadx=4)
 
 
 text_input = scrolledtext.ScrolledText(second_frame,width=72,height=8)
-# text_input.insert(END,'Hello rabin, This is an awesome application\nPlease let me know when you are available.')
+# text_input.insert(END,'Hello')
 # print(text_input.get('1.0',END))
 text_input.grid(row=0,column=0,padx=0,pady=4)
 
 def analyze_clicked():
     global cleaned_text
     list_sentence = text_input.get('1.0',END).split('\n')
-    list_sentence = [porter_stemmer(removing_stopwords(cleaner(sentence))) for sentence in list_sentence if len(sentence)!=0]
-    text_input.delete('0.0', END)
-    text_input.insert(END,'\n'.join(list_sentence))
+    list_sentence = [removing_stopwords(cleaner(sentence)) for sentence in list_sentence if len(sentence)!=0]
+    clean_input.delete('0.0', END)
+    clean_input.insert(END,'\n'.join(list_sentence))
+    # text_input.delete('0.0', END)
+    # text_input.insert(END,'\n'.join(list_sentence))
     cleaned_text = list_sentence
-    # print(cleaned_text)
     ############ Testing ##############
     if len(cleaned_text) !=0:
         if not model_loaded:
@@ -235,17 +227,25 @@ def analyze_clicked():
         for item in tree3.get_children():
             tree3.delete(item)
         for sentence,g,m,b,dec,knnC,LOGREs,randomF,svc_lin in zip(cleaned_text,classes_gnb,classes_mnb,classes_bnb,decision_t,knn_c,logRe,random_f,linear):
-            tree2.insert('', 'end', text="1", values=(sentence,po_ne(LOGREs),po_ne(svc_lin),po_ne(m),po_ne(randomF),po_ne(b),po_ne(knnC),po_ne(g),po_ne(dec)))
-            tree3.insert('', 'end', text="1", values=(sentence,'pos' if (g+m+b+dec+knnC+LOGREs+randomF+svc_lin)>=4 else 'neg'))
+            if sentence != '':
+                tree2.insert('', 'end', text="1", values=(sentence,po_ne(LOGREs),po_ne(svc_lin),po_ne(m),po_ne(randomF),po_ne(b),po_ne(knnC),po_ne(g),po_ne(dec)))
+                tree3.insert('', 'end', text="1", values=(sentence,'pos' if (g+m+b+dec+knnC+LOGREs+randomF+svc_lin)>=4 else 'neg'))
 
 
 analyze_button = Button(second_frame,text='  Analyze ',font=('Comic Sans MS',18,'normal'),command=analyze_clicked,borderwidth=1,relief=RAISED ,pady=10)
 analyze_button.grid(column=1,row=0)
 
 # row 2
+clean_frame = LabelFrame(window,text='Cleaned Text')
+clean_frame.columnconfigure(0, weight=1)
+clean_frame.grid(row=2,column=0,ipadx=4)
+clean_input = scrolledtext.ScrolledText(clean_frame,width=86,height=5)
+clean_input.grid(row=0,column=0,padx=0,pady=4)
+
+# row 3
 third_frame = Frame(window)
 third_frame.columnconfigure(0, weight=1)
-third_frame.grid(row=2,column=0,padx=5,pady=8)
+third_frame.grid(row=3,column=0,padx=5,pady=8)
 
 # Tabs notbook
 third_notebook = ttk.Notebook(third_frame)
