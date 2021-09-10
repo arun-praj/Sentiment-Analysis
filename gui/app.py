@@ -7,7 +7,7 @@ import sounddevice,argparse,_thread,pickle
 import queue,vosk,ast,os
 
 window = Tk()
-window.geometry("826x630")
+window.geometry("826x650")
 # window.resizable(0,0)
 window.wm_iconbitmap('gui/icon.ico')
 window.title('Sentimental Analysis')
@@ -49,8 +49,15 @@ def load_model():
     dec_tf = pickle.load(open('Decision Tree/vectorizer.sav','rb'))
     print('____model loaded_____')
 
+# main notebook
+main_notebook = ttk.Notebook(window)
+main_notebook.grid(row=0,column=0)
+main_frame = Frame(main_notebook)
+main_frame.columnconfigure(0, weight=1)
+main_frame.grid(row=0,column=0)
+
 # row 0
-first_frame = ttk.Frame(window)
+first_frame = ttk.Frame(main_frame)
 first_frame.columnconfigure(0, weight=1)
 first_frame.grid(row=0,column=0)
 
@@ -189,7 +196,7 @@ folder_button = Button(first_frame,image=folder_icon,command=folder_clicked,bord
 folder_button.grid(column=2,row=0,padx=10,pady=10)
 
 # row 1
-second_frame = LabelFrame(window,text='Input Text')
+second_frame = LabelFrame(main_frame,text='Input Text')
 second_frame.columnconfigure(0, weight=1)
 second_frame.grid(row=1,column=0,ipadx=4)
 
@@ -236,14 +243,14 @@ analyze_button = Button(second_frame,text='  Analyze ',font=('Comic Sans MS',18,
 analyze_button.grid(column=1,row=0)
 
 # row 2
-clean_frame = LabelFrame(window,text='Cleaned Text')
+clean_frame = LabelFrame(main_frame,text='Cleaned Text')
 clean_frame.columnconfigure(0, weight=1)
 clean_frame.grid(row=2,column=0,ipadx=4)
 clean_input = scrolledtext.ScrolledText(clean_frame,width=86,height=5)
 clean_input.grid(row=0,column=0,padx=0,pady=4)
 
 # row 3
-third_frame = Frame(window)
+third_frame = Frame(main_frame)
 third_frame.columnconfigure(0, weight=1)
 third_frame.grid(row=3,column=0,padx=5,pady=8)
 
@@ -307,5 +314,15 @@ third_notebook.add(tree2,text='Sentiment')
 third_notebook.add(tree3,text='Sentence')
 third_notebook.add(tree,text='Result')
 
+# second main tab
+graph_frame = ttk.Frame(main_notebook)
+graph_frame.columnconfigure(0, weight=1)
+graph_frame.grid(row=0,column=0)
+graph_output = PhotoImage(file='gui/output.png',width=700)
+graph_button = Button(graph_frame,image=graph_output,borderwidth=0,relief=RIDGE)
+graph_button.grid(column=0,row=0)
+
+main_notebook.add(main_frame,text='Main')
+main_notebook.add(graph_frame,text='Graph')
 
 window.mainloop()
