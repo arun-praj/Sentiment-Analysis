@@ -16,7 +16,7 @@ def lemaa(sentence):
 def porter_stemmer(sentence):
     return stemmerr(lemaa(sentence))
 
-sent1 = 'goes gone going'
+# sent1 = 'goes gone going'
 # sent1 ='walk walking walked'
-sent1 = porter_stemmer(sent1)
-print(sent1)
+# sent1 = porter_stemmer(sent1)
+# print(sent1)

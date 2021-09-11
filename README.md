@@ -95,6 +95,17 @@
     * n-> count of corpus
         - corpus -> total document set
 
+# TF_IDF problems:
+
+    - bow and tf-idf approach semantic information is not stored.
+    - TF_IDF impportance to uncommon words.
+    - chance of overfitting
+
+# Word2Vec
+
+    - Each word is basically represented as a vector of 32 or more dimension instead of a singular number.
+    - Here the semantic information and relation between different words is also preserved.
+
 # How to convert Text to Vectorizer
 
     - We can use either CountVectorizer or TfidfTransfomer
