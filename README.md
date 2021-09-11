@@ -6,7 +6,23 @@
     - Word2Vec
     - WOrd Embedding (Vectorization)
 
-# Bags of wrods model.
+# Bag of words
+
+    - sent1 = good boy
+    - sent2 = good girl
+    - sent3 = boy girl good
+    - words/frequency
+        - good-> 3
+        - boy -> 2
+        - girl-> 2
+    - Vectors
+    | sn    | good | boy | girl | o/p |
+    | ----- | ---- | --- | ---- | --- |
+    | sent1 | 1    | 0   | 0    |     |
+    | sent2 | 1    | 0   | 1    |     |
+    | sent3 | 1    | 1   | 1    |     |
+
+# Bags of words model.
 
     - The bag of word model is simple to understand and impelement. It is a way of extracting features from the text for use in machine learning algorithms. It has seen greate success in problems such as: NLP,Information retrieval from documents, Document Classifications.
     * Feature Extraction Process: input text -> clean text -> tokenize -> build vocabulary -> generate vectors -> ml algorithm.
@@ -36,6 +52,36 @@
 
 # TF-IDF Algorithm or word ferquency algorithm.
 
+    - Term Frequency = (no.of repeated words in sentece/no.of words in sentece)
+    - IDF = log(no.of sentences / no.of sentences containing words)
+    - TF-IDF = TF*IDF
+        - sent1 = good boy
+        - sent2 = good girl
+        - sent3 = boy girl good
+        - words/frequency
+            - good-> 3
+            - boy -> 2
+            - girl-> 2
+            TF->
+            | sn   | sent1 | sent2 | sent3 |
+            | ---- | ----- | ----- | ----- |
+            | good | 1/2   | 1\2   | 1/3   |
+            | boy  | 1/2   | 0     | 1/3   |
+            | girl | 0     | 1\2   | 1/3   |
+            IDF->
+            | words | IDF        |
+            | ----- | ---------- |
+            | good  | log(3/3)=0 |
+            | boy   | log(3/2)   |
+            | girl  | log(3/2) |
+            TF_IDF->
+            | sn    | f1   | f2            | f3            | o/p |
+            | ----- | ---- | ------------- | ------------- | --- |
+            |       | good | boy           | girl          |     |
+            | sent1 | 0    | 1/2\*log(3/2) | 0             |     |
+            | sent2 | 0    | 0             | 1/2\*log(3/2) |     |
+            | sent3 |      |               |               |     |
+
     - Term Frequency - Inverse Document Frequency
         * Term Frequency: This measures the frequency of a word in a doucment.
             - When we are vectorizing the documents, we check for each words counts. In worst case if the term doesn't exist in the docuemnt, then the particular TF value is 0 and in other extreme case, if all the words in the documents are same then it will be 1. The final value of the normalised TF value will be in the range if [0 to 1].
@@ -53,3 +99,27 @@
 
     - We can use either CountVectorizer or TfidfTransfomer
     - In this project we use TfidfVectorizer (uses bothCountVectorizer and TfidfTransfomer)
+
+# Tokenization:
+
+    - breakup the sentence into words.(sentence into list)
+    - nltk is analysis of words not sentences.
+
+# Stop words
+
+    - That does add any meaning.
+
+# Stemming and Lemmatization
+
+    - process of reducing infected words to their word stem
+    - eg: going,goes,gone -> go
+
+# CountVectorizer
+
+    - Convert all sentences into vectors.
+    - Bags of Words
+    -
+
+# CountVectorizer vs. TD-IDF
+
+    -
