@@ -17,3 +17,6 @@ NN Model/.ipynb_checkpoints/main-checkpoint.ipynb
 gui/record.txt
 gui/test.py
 dataset/cleaned_Porter_stemmer.csv
+preprocesser/__pycache__/
+dataset/movie_test.csv
+dataset/movie_train.csv
