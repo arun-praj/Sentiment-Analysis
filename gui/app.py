@@ -17,6 +17,8 @@ style.theme_use('xpnative')# ('winnative', 'clam', 'alt', 'default', 'classic', 
 
 # global variables
 is_recording,model_loaded = False,False
+check_state = IntVar() # BoolreanVar() for boolean
+check_state1 = 1
 final_text,cleaned_text = [],[]
 gnb,mnb,bnb,nb_tf,logreg,log_tf,linear_svc,svc_tf,rnd_f,rnd_tf,knn,knn_tf,dec_t,dec_tf = None,None,None,None,None,None,None,None,None,None,None,None,None,None
 current_text = StringVar()
@@ -42,7 +44,7 @@ def load_model():
     rnd_f = pickle.load(open('Random Forest/rnd_f.sav','rb'))
     rnd_tf = pickle.load(open('Random Forest/vectorizer.sav','rb'))
 
-    knn = pickle.load(open('KNN/knn.sav','rb'))
+    knn = pickle.load(open('KNN/knn_0.799_20,40,2.sav','rb'))
     knn_tf = pickle.load(open('KNN/vectorizer.sav','rb'))
 
     dec_t = pickle.load(open('Decision Tree/dec_tree.sav','rb'))
@@ -209,7 +211,13 @@ text_input.grid(row=0,column=0,padx=0,pady=4)
 def analyze_clicked():
     global cleaned_text
     list_sentence = text_input.get('1.0',END).split('\n')
-    list_sentence = [removing_stopwords(cleaner(sentence)) for sentence in list_sentence if len(sentence)!=0]
+    if check_state1:
+        list_sentence = [removing_stopwords(cleaner(sentence)) for sentence in list_sentence if len(sentence)!=0]
+        print('clean')
+    else:
+        list_sentence = [sentence for sentence in list_sentence if len(sentence)!=0]
+        print('not clean')
+        
     clean_input.delete('0.0', END)
     clean_input.insert(END,'\n'.join(list_sentence))
     # text_input.delete('0.0', END)
@@ -235,12 +243,31 @@ def analyze_clicked():
             tree3.delete(item)
         for sentence,g,m,b,dec,knnC,LOGREs,randomF,svc_lin in zip(cleaned_text,classes_gnb,classes_mnb,classes_bnb,decision_t,knn_c,logRe,random_f,linear):
             if sentence != '':
-                tree2.insert('', 'end', text="1", values=(sentence,po_ne(LOGREs),po_ne(svc_lin),po_ne(m),po_ne(randomF),po_ne(b),po_ne(knnC),po_ne(g),po_ne(dec)))
+                tree2.insert('', 'end', text="1", values=(sentence,po_ne(LOGREs),po_ne(m),po_ne(knnC),po_ne(dec)))
+                # tree2.insert('', 'end', text="1", values=(sentence,po_ne(LOGREs),po_ne(svc_lin),po_ne(m),po_ne(randomF),po_ne(b),po_ne(knnC),po_ne(g),po_ne(dec)))
                 tree3.insert('', 'end', text="1", values=(sentence,'pos' if (g+m+b+dec+knnC+LOGREs+randomF+svc_lin)>=4 else 'neg'))
 
 
-analyze_button = Button(second_frame,text='  Analyze ',font=('Comic Sans MS',18,'normal'),command=analyze_clicked,borderwidth=1,relief=RAISED ,pady=10)
+analyze_button = Button(second_frame,text='  Analyze ',font=('Comic Sans MS',18,'normal'),command=analyze_clicked,borderwidth=1,relief=RAISED ,pady=6)
 analyze_button.grid(column=1,row=0)
+# clean radio
+
+# Checkbutton
+def checkbutton_used():
+    global check_state1
+    if check_state1==1:
+        check_state1 = 0
+        check_state.set(0)
+    elif check_state1 ==0:
+        check_state1 = 1
+        check_state.set(1)
+        
+    print(check_state.get(),check_state1)
+
+
+checkbutton = Checkbutton(second_frame,text='Clean',variable=check_state,command=checkbutton_used)
+check_state.set(1)
+checkbutton.grid(row=2,column=1)
 
 # row 2
 clean_frame = LabelFrame(main_frame,text='Cleaned Text')
@@ -271,34 +298,38 @@ tree.column("# 5", anchor=CENTER,width=150)
 tree.heading("#5", text="Precision")
 
 tree.insert('', 'end', text="1", values=('Logestic',0.89,89.5,91.4,88.1))
-tree.insert('', 'end', text="1", values=('SVC',0.88,88.2,89.4,86.9))
+# tree.insert('', 'end', text="1", values=('SVC',0.88,88.2,89.4,86.9))
 tree.insert('', 'end', text="1", values=('Multinomial NB',0.86,86.4,86.4,86.4))
-tree.insert('', 'end', text="1", values=('Random Forest',0.85,84.9,84.3,85.6))
-tree.insert('', 'end', text="1", values=('Bernoulli NB',0.84,83.6,81.6,86.2))
+# tree.insert('', 'end', text="1", values=('Random Forest',0.85,84.9,84.3,85.6))
+# tree.insert('', 'end', text="1", values=('Bernoulli NB',0.84,83.6,81.6,86.2))
 tree.insert('', 'end', text="1", values=('KNN',0.78,79.1,84.2,74.5))
-tree.insert('', 'end', text="1", values=('Gaussain NB',0.76,74.9,72.64,77.3))
+# tree.insert('', 'end', text="1", values=('Gaussain NB',0.76,74.9,72.64,77.3))
 tree.insert('', 'end', text="1", values=('Decision Tree',0.72,71.7,71.1,71.9))
 tree.grid(row=0,column=0,pady=10,padx=5)
 
 tree2 = ttk.Treeview(third_notebook,column=("Sentence/Algorithm",'Logestic', "SVC","Multinomial NB","Random Forest","Bernoulli NB","KNN","Gaussain NB","Decision Tree"), show='headings', height=9)
 tree2.column("# 1")
 tree2.heading("#1", text="Sentence/Algorithm")
-tree2.column("# 2", anchor=CENTER,width=38)
+tree2.column("# 2", anchor=CENTER,width=80)
 tree2.heading("#2", text="Logestic")
-tree2.column("# 3", anchor=CENTER,width=14)
-tree2.heading("#3", text="SVC")
-tree2.column("# 4", anchor=CENTER,width=78)
-tree2.heading("#4", text="Multinomial NB")
-tree2.column("# 5", anchor=CENTER,width=78)
-tree2.heading("#5", text="Random Forest")
-tree2.column("# 6", anchor=CENTER,width=62)
-tree2.heading("#6", text="Bernoulli NB")
-tree2.column("# 7", anchor=CENTER,width=18)
-tree2.heading("#7", text="KNN")
-tree2.column("# 8", anchor=CENTER,width=60)
-tree2.heading("#8", text="Gaussain NB")
-tree2.column("# 9", anchor=CENTER,width=66)
-tree2.heading("#9", text="Decision Tree")
+tree2.column("# 6", anchor=CENTER,width=80)
+# tree2.heading("#3", text=" ")
+# tree2.heading("#3", text="SVC")
+tree2.column("# 3", anchor=CENTER,width=100)
+tree2.heading("#3", text="Multinomial NB")
+tree2.column("# 7", anchor=CENTER,width=78)
+# tree2.heading("#5", text=" ")
+# tree2.heading("#5", text="Random Forest")
+tree2.column("# 8", anchor=CENTER,width=62)
+# tree2.heading("#6", text=" ")
+# tree2.heading("#6", text="Bernoulli NB")
+tree2.column("# 4", anchor=CENTER,width=80)
+tree2.heading("#4", text="KNN")
+tree2.column("# 9", anchor=CENTER,width=60)
+# tree2.heading("#8", text=" ")
+# tree2.heading("#8", text="Gaussain NB")
+tree2.column("# 5", anchor=CENTER,width=90)
+tree2.heading("#5", text="Decision Tree")
 # tree2.insert('', 'end', text="1", values=('KNN Random Forest Random Forest Random Forest Random Forest','86%','Best'))
 tree2.grid(row=0,column=0,pady=10,padx=5)
 
@@ -318,7 +349,7 @@ third_notebook.add(tree,text='Result')
 graph_frame = ttk.Frame(main_notebook)
 graph_frame.columnconfigure(0, weight=1)
 graph_frame.grid(row=0,column=0)
-graph_output = PhotoImage(file='gui/output.png',width=700)
+graph_output = PhotoImage(file='gui/output.png',width=810)
 graph_button = Button(graph_frame,image=graph_output,borderwidth=0,relief=RIDGE)
 graph_button.grid(column=0,row=0)
 
